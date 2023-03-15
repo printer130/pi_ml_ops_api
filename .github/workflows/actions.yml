@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Extraction
-          run: python ./etl/extraction.py
+          run: echo "Hola Leonardo ctm"
