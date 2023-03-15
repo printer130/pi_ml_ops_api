@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Extraction
-          run: echo "Hola Leonardo ctm"
+          run: python test.py
