@@ -1,4 +1,5 @@
 import pandas as pd
+from constants import dicc
 
 def get_dataframe(file_path):
   df = pd.read_csv(file_path)
@@ -12,8 +13,8 @@ def handle_nulls(df):
   df["rating"].fillna("G", inplace=True)
   return df
 
-def handle_ids(df):
-  df['id'] = df.apply(lambda x: "a" + x['show_id'], axis=1)
+def handle_ids(df, id):
+  df['id'] = df.apply(lambda x: id + x['show_id'], axis=1)
   df.drop(columns =["show_id"], inplace = True)
   return df
 
@@ -24,8 +25,10 @@ def handle_datefield(df):
 
 def handle_duration(df):
   new = df["duration"].str.split(" ", n = 1, expand = True)
-  df["duration_int"] = new[0]
-  df["duration_int"].fillna("50", inplace=True)
+  #df["duration_int"] = new[0]
+  df["duration_int"] = new[0].astype('Int64')
+  mean = df["duration_int"].mean(axis=0, numeric_only=True, skipna=True)
+  df["duration_int"].fillna(int(mean), inplace=True)
   df["duration_type"] = new[1]
   df['duration_type'] = df['duration_type'].replace('Season','Seasons')
   df["duration_type"].fillna("no", inplace=True)
@@ -34,29 +37,32 @@ def handle_duration(df):
 
 def handle_lower(df):
   dtypes = df.dtypes.to_dict()
+  print(df.dtypes)
   my_type = 'object' # because str have len its not a str :| but object
   for col_name, typ in dtypes.items():
-    if typ == my_type :
-      df[col_name] = df[col_name].apply(str.lower)
+    if typ == my_type:
+      df[col_name] = df[col_name].str.lower()
   return df
 
-def main(file_path):
+def main(file_path, id):
   df = get_dataframe(file_path)
   df = handle_nulls(df)
-  df = handle_ids(df)
+  df = handle_ids(df, id)
   df = handle_datefield(df)
   df = handle_duration(df)
-  #df = handle_lower(df)
+  df = handle_lower(df)
   return df
 
 if __name__ == "__main__":
-  file_path1 = 'datasets/amazon_prime_titles.csv'
-  file_path2 = 'datasets/disney_plus_titles.csv'
-  file_path3 = 'datasets/hulu_titles.csv'
-  file_path4 = 'datasets/netflix_titles.csv'
-  df_1 = main(file_path3)
-  #df_2 = main(file_path2)
-  #df_3 = main(file_path3)
-  #df_4 = main(file_path4)
-  #df_t = pd.concat([df_1, df_2, df_3, df_4])
-  print(df_1["duration_int"])
+  clean_dfs = []
+
+  for i, val in enumerate(dicc):
+    clean_df = main(val["file_path"], val["id"])
+    clean_dfs.append(clean_df)
+
+  merged_df = pd.concat(clean_dfs)
+  print(merged_df.shape)
+  compression_opts = dict(method='zip',
+                        archive_name='out.csv')
+  merged_df.to_csv('out.zip', encoding='utf-8', index=False, compression=compression_opts) 
+

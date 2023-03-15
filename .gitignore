@@ -10,3 +10,5 @@ ratings/**
 ratings/*
 ratings
 datasets
+out.csv
+out.zip
