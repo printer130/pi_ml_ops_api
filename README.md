@@ -29,22 +29,22 @@
 - **duration_type**: seasons, min
 - **year**
 
-### URLs:
+### Ejemplos:
 
-### get_max_duration
+#### get_max_duration
 
-*/api/get_max_duration/?**platform**=amazon&**year**=2010&**duration_type**=seasons*
+*`/api/get_max_duration/?**platform**=amazon&**year**=2010&**duration_type**=seasons`*
 
-### get_count_platform
+#### get_count_platform
 
-*/api/get_count_platform/?**platform**=amazon*
+*`/api/get_count_platform/?**platform**=amazon`*
 
-### get_actor
+#### get_actor
 
-*/api/get_actor/?**platform**=amazon&**year**=2010*
+*`/api/get_actor/?**platform**=amazon&**year**=2010`*
 
 <br>
 
-[ ] **`Análisis exploratorio de los datos: (Exploratory Data Analysis-EDA)`**:
+- [ ] **`Análisis exploratorio de los datos: (Exploratory Data Analysis-EDA)`**:
 
-[ ] **`Sistema de recomendación`**: 
+- [ ] **`Sistema de recomendación`**: 
