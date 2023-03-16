@@ -24,3 +24,21 @@
 
 - [x] Actor que más se repite según plataforma y año. (La función debe llamarse get_actor(platform, year))
 
+### Parametros:
+- **platform**: amazon, hulu, disney, netflix
+- **duration_type**: seasons, min
+- **year**
+
+### URLs:
+
+### get_max_duration
+
+*/api/get_max_duration/?**platform**=amazon&**year**=2010&**duration_type**=seasons*
+
+### get_count_platform
+
+*/api/get_count_platform/?**platform**=amazon*
+
+### get_actor
+
+*/api/get_actor/?**platform**=amazon&**year**=2010*
