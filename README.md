@@ -42,3 +42,9 @@
 ### get_actor
 
 */api/get_actor/?**platform**=amazon&**year**=2010*
+
+<br>
+
+[ ] **`Análisis exploratorio de los datos: (Exploratory Data Analysis-EDA)`**:
+
+[ ] **`Sistema de recomendación`**: 
