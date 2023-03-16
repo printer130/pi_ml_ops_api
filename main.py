@@ -4,6 +4,7 @@ import uvicorn
 from db import get_database
 import routes
 from fastapi.middleware.cors import CORSMiddleware
+from query import get_most_common_actor, get_most_common_movie
 
 app = FastAPI()
 
@@ -73,7 +74,6 @@ def get_score_count(platform: str, score: int, year: int):
     #  }
     #}
   ])
-  print("[FINE]")
 
   print("RESULT:", list(result))
   for item in result:
@@ -89,35 +89,17 @@ def get_score_count(platform: str, score: int, year: int):
 @app.get("/api/get_count_platform")
 def get_count_platform(platform):
   collection = get_database()
-  query = [
-    {
-      "$match": {
-        "platform": platform
-      }
-    },
-    {
-      "$group": {
-        "_id": "$platform",
-        "count": {
-          "$sum": 1
-        }
-      }
-    }
-  ]
-  result = collection.aggregate(query)
-  actor = {}
-  if not result:
+  movie = get_most_common_movie(collection, platform)
+
+  if not movie:
     return {
       "data": None,
       "status": 'ok',
       "error": None
     }
 
-  for i, val in enumerate(result):
-    actor = val
-
   return {
-    "data": actor,
+    "data": movie,
     "status": 'ok',
     "error": None
   }
@@ -127,34 +109,18 @@ def get_count_platform(platform):
 @app.get('/api/get_actor')
 def get_actor(platform: str, year: int):
   collection = get_database()
-  query = [
-    {
-      "$match": {"platform": platform, "release_year": int(year) }
-    },
-    { "$group" : {"_id":"$director", "count":{"$sum":1}} },
-    { 
-      "$sort": { "count": -1 } 
-    },
-    {
-      "$limit": 2
-    }
-  ]
-  result = collection.aggregate(query)
+  obj_actor = get_most_common_actor(collection, platform, year)
 
-  res = []
-  for item in result:
-    res.append(item)
-  actor = res[-1]["_id"]
-
-  #Check null values
+  actor = obj_actor["_id"]
+  count = obj_actor["count"]
+  #Check null values or if exists
   if actor == 'no':
     return {
     "data": { "actor": None },
     "error": None,
     "status": "OK"
   }
-
-  count = res[-1]["count"]
+  
   return {
     "data": {"actor": actor, "count": count },
     "error": None,
