@@ -1,0 +1,4 @@
+userId.auto()
+rating.auto()
+timestamp.auto()
+movieId.auto()
