@@ -20,7 +20,7 @@
 
 - [ ] Cantidad de películas por plataforma con un puntaje mayor a XX en determinado año (la función debe llamarse get_score_count(platform, scored, year))
 
-- [ ] Cantidad de películas por plataforma con filtro de PLATAFORMA. (La función debe llamarse get_count_platform(platform))
+- [x] Cantidad de películas por plataforma con filtro de PLATAFORMA. (La función debe llamarse get_count_platform(platform))
 
-- [ ] Actor que más se repite según plataforma y año. (La función debe llamarse get_actor(platform, year))
+- [x] Actor que más se repite según plataforma y año. (La función debe llamarse get_actor(platform, year))
 
