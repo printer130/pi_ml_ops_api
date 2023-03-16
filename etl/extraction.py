@@ -13,9 +13,10 @@ def handle_nulls(df):
   df["rating"].fillna("G", inplace=True)
   return df
 
-def handle_ids(df, id):
+def handle_ids(df, id, platform):
   df['id'] = df.apply(lambda x: id + x['show_id'], axis=1)
   df.drop(columns =["show_id"], inplace = True)
+  df["platform"] = platform
   return df
 
 def handle_datefield(df):
@@ -44,10 +45,10 @@ def handle_lower(df):
       df[col_name] = df[col_name].str.lower()
   return df
 
-def main(file_path, id):
+def main(file_path, id, platform):
   df = get_dataframe(file_path)
   df = handle_nulls(df)
-  df = handle_ids(df, id)
+  df = handle_ids(df, id, platform)
   df = handle_datefield(df)
   df = handle_duration(df)
   df = handle_lower(df)
@@ -57,7 +58,7 @@ if __name__ == "__main__":
   clean_dfs = []
 
   for i, val in enumerate(dicc):
-    clean_df = main(val["file_path"], val["id"])
+    clean_df = main(val["file_path"], val["id"], val["platform"])
     clean_dfs.append(clean_df)
 
   merged_df = pd.concat(clean_dfs)

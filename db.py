@@ -4,12 +4,13 @@ import os
 # from os.path import join, dirname
 # dotenv_path = join(dirname(__file__), '.env')
 load_dotenv()
-DATABASE_NAME = os.environ.get("DATABASE_NAME")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def get_database():
-  db = MongoClient(DATABASE_NAME)
-  db_cu = db.cu
-  return db_cu
+  client = MongoClient(DATABASE_URL)
+  db = client["cu"]
+  collection = db["with_types"]
+  return collection
   #try:
   #  db_cu = db.cu
     #yield db_cu

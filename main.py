@@ -20,16 +20,25 @@ app.add_middleware(
 )
 app.include_router(routes.router, tags=['Movies'], prefix='/api/movies')
 
-@app.get('/')
-def get_name():
-  return { 'hola': 'hello leonardo' }
+# AÑO, PLATAFORMA Y TIPO DE DURACIÓN
+#/?first=1&second=12&third=5
+@app.get('/api')
+def get_max_duration(year: int, platform: str, duration_type: str):
+  query = {
+    "$and": [
+      { "release_year": { "$eq": int(year) }},
+      { "duration_type": { "$eq": duration_type }},
+      # { "id": { "$regex" : "^a"} }
+      { "platform": { "$eq": platform }}
+    ]
+  }
 
-@app.get('/{year}/{platform}/{duration_type}')
-def get_max_duration():
-  return 'get_max_duration'
+  collection = get_database()
+  q = collection.find(query)
+  for item in q:
+    print(item)
 
-@app.get('/{movieId}')
-def get_max_duration():
-  #movies = get_database.amazon_prime_titles.find()
-  return "movies"
-# year, platform, duration_type
+  return {
+    "error": None,
+    "status": "Ok"
+  }
