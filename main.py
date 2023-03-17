@@ -40,35 +40,46 @@ def get_max_duration(year: int=None,platform: str=None, duration_type: str=None)
 
 """ Cantidad de películas por plataforma con un puntaje mayor a XX en determinado año (la función debe llamarse get_score_count(platform, scored, year))
 """
-
 @app.get("/api/get_score_count")
 def get_score_count(platform: str, score: int, year: int):
   first_letter = platform[:1]
-  print(platform, score, year, first_letter)
   print(platform, float(score), int(year), first_letter)
 
   collection = get_database()
-  result = collection.aggregate([
-    { "$match": { "release_year": 2015, "platform": "amazon" } },
+  cursor = collection.aggregate([
+    {
+      "$match": {
+        "release_year": 2015,
+        "platform": "amazon"
+      }
+    },
     {
       "$lookup": {
         "from": "ratings",
         "localField": "id",
         "foreignField": "movieId",
-        "as": "ratings_docs",
+        "as": "rating_table"
       }
+    },
+    {
+      "$unwind": "$rating_table"
+    },
+    {
+      "$match": {
+        "rating_table.rating": { "$gte": 4 }
+      }
+    },
+    {
+      "$group": { "_id": None, "count": {"$sum": 1}}
     }
-    #{
-    #  "$group": {
-    #    "_id": None,
-    #    "count": { "$sum": 1 }
-    #  }
-    #}
   ])
 
-  print("RESULT:", list(result))
-  for item in result:
+  #l = []
+  for item in cursor:
     print(item)
+  #  l.append(item)
+  #count = len(l)
+  #print(count)
   
   return {
     "error": None,
