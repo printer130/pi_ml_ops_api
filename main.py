@@ -1,5 +1,4 @@
 from fastapi import FastAPI, status, APIRouter
-import asyncio
 import uvicorn
 from db import get_database
 import json
