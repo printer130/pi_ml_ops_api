@@ -8,7 +8,7 @@ importlib-metadata==6.0.0
 jedi==0.18.2
 matplotlib-inline==0.1.6
 nest-asyncio==1.5.6
-numpy==1.24.2
+numpy==1.24.0
 packaging==23.0
 pandas==1.5.3
 parso==0.8.3
