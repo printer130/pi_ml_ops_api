@@ -2,7 +2,6 @@ from fastapi import FastAPI, status, APIRouter
 import uvicorn
 from db import get_database
 import json
-import routes
 from fastapi.middleware.cors import CORSMiddleware
 from query import get_most_common_actor, get_most_common_movie, get_max_duration_by
 
@@ -19,7 +18,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(routes.router, tags=['Movies'], prefix='/api/movies')
 
 """ Película con mayor duración con filtros opcionales de AÑO, PLATAFORMA Y TIPO DE DURACIÓN. (la función debe llamarse get_max_duration(year, platform, duration_type)) """
 @app.get('/api/get_max_duration')
