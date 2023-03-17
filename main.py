@@ -1,4 +1,5 @@
 from fastapi import FastAPI, status, APIRouter
+import os
 import uvicorn
 from db import get_database
 import json
@@ -18,6 +19,12 @@ origins = [
     allow_methods=["*"],
     allow_headers=["*"],
 ) """
+
+@app.get("/")
+def root():
+  return {
+    "ok": "running"
+  }
 
 """ Película con mayor duración con filtros opcionales de AÑO, PLATAFORMA Y TIPO DE DURACIÓN. (la función debe llamarse get_max_duration(year, platform, duration_type)) """
 @app.get('/api/get_max_duration')
@@ -85,7 +92,9 @@ def get_score_count(platform: str, score: int, year: int):
 """ Cantidad de películas por plataforma con filtro de PLATAFORMA. (La función debe llamarse get_count_platform(platform))
  """
 @app.get("/api/get_count_platform")
-async def get_count_platform(platform):
+def get_count_platform(platform):
+  db = os.environ.get("DATABASE_URL")
+  print(db)
   collection = get_database()
   movie = get_most_common_movie(collection, platform)
 
