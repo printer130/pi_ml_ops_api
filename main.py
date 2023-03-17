@@ -2,7 +2,7 @@ from fastapi import FastAPI, status, APIRouter
 import uvicorn
 from db import get_database
 import json
-from fastapi.middleware.cors import CORSMiddleware
+#from fastapi.middleware.cors import CORSMiddleware
 from query import get_most_common_actor, get_most_common_movie, get_max_duration_by
 
 app = FastAPI()
@@ -11,13 +11,13 @@ origins = [
     "http://localhost:8000",
 ]
 
-app.add_middleware(
+""" app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins='*',
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+) """
 
 """ Película con mayor duración con filtros opcionales de AÑO, PLATAFORMA Y TIPO DE DURACIÓN. (la función debe llamarse get_max_duration(year, platform, duration_type)) """
 @app.get('/api/get_max_duration')
@@ -40,7 +40,6 @@ def get_max_duration(year: int=None,platform: str=None, duration_type: str=None)
 @app.get("/api/get_score_count")
 def get_score_count(platform: str, score: int, year: int):
   first_letter = platform[:1]
-  print(platform, float(score), int(year), first_letter)
 
   collection = get_database()
   cursor = collection.aggregate([
