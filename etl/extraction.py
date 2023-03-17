@@ -6,9 +6,9 @@ def get_dataframe(file_path):
   return df
 
 def handle_nulls(df):
-  df["director"].fillna("no", inplace=True)
-  df["cast"].fillna("no", inplace=True)
-  df["country"].fillna("no", inplace=True)
+  df["director"].fillna("unknown", inplace=True)
+  df["cast"].fillna("unknown", inplace=True)
+  df["country"].fillna("unknown", inplace=True)
   #df["date_added"].fillna("no", inplace=True)
   df["rating"].fillna("G", inplace=True)
   return df
@@ -29,16 +29,16 @@ def handle_duration(df):
   #df["duration_int"] = new[0]
   df["duration_int"] = new[0].astype('Int64')
   mean = df["duration_int"].mean(axis=0, numeric_only=True, skipna=True)
-  df["duration_int"].fillna(int(mean), inplace=True)
+  df["duration_int"].fillna(round(mean), inplace=True)
   df["duration_type"] = new[1]
   df['duration_type'] = df['duration_type'].replace('Season','Seasons')
-  df["duration_type"].fillna("no", inplace=True)
+  df["duration_type"].fillna("unknown", inplace=True)
   df.drop(columns=["duration"], inplace = True)
   return df
 
 def handle_lower(df):
+  # convert to lowerCase only strings in pands should be object thing
   dtypes = df.dtypes.to_dict()
-  print(df.dtypes)
   my_type = 'object' # because str have len its not a str :| but object
   for col_name, typ in dtypes.items():
     if typ == my_type:
@@ -47,6 +47,8 @@ def handle_lower(df):
 
 def main(file_path, id, platform):
   df = get_dataframe(file_path)
+  print("_----------------->>>", platform)
+  print(df.isna().sum())
   df = handle_nulls(df)
   df = handle_ids(df, id, platform)
   df = handle_datefield(df)
@@ -65,5 +67,6 @@ if __name__ == "__main__":
   print(merged_df.shape)
   compression_opts = dict(method='zip',
                         archive_name='out.csv')
+
   merged_df.to_csv('out.zip', encoding='utf-8', index=False, compression=compression_opts) 
 
