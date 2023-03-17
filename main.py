@@ -2,9 +2,10 @@ from fastapi import FastAPI, status, APIRouter
 import asyncio
 import uvicorn
 from db import get_database
+import json
 import routes
 from fastapi.middleware.cors import CORSMiddleware
-from query import get_most_common_actor, get_most_common_movie
+from query import get_most_common_actor, get_most_common_movie, get_max_duration_by
 
 app = FastAPI()
 
@@ -21,33 +22,23 @@ app.add_middleware(
 )
 app.include_router(routes.router, tags=['Movies'], prefix='/api/movies')
 
-# AÑO, PLATAFORMA Y TIPO DE DURACIÓN
-#/?first=1&second=12&third=5
+""" Película con mayor duración con filtros opcionales de AÑO, PLATAFORMA Y TIPO DE DURACIÓN. (la función debe llamarse get_max_duration(year, platform, duration_type)) """
 @app.get('/api/get_max_duration')
-def get_max_duration(year: int, platform: str, duration_type: str):
-  query = {
-    "$and": [
-      { "release_year": { "$eq": int(year) }},
-      { "duration_type": { "$eq": duration_type }},
-      # { "id": { "$regex" : "^a"} }
-      { "platform": { "$eq": platform }}
-    ]
-  }
-
+def get_max_duration(year: int=None,platform: str=None, duration_type: str=None):
+  print(year,platform,duration_type)
   collection = get_database()
-  q = collection.find(query)
-  for item in q:
-    print(item)
-
+  movies_json = get_max_duration_by(collection, year, duration_type, platform)
+  if movies_json == None:
+    return {
+      "data": None
+    }
   return {
+    "data": movies_json,
     "error": None,
     "status": "Ok"
   }
 
 """ Cantidad de películas por plataforma con un puntaje mayor a XX en determinado año (la función debe llamarse get_score_count(platform, scored, year))
-[] platform $eq
-[] scored > XX
-[] year $eq
 """
 
 @app.get("/api/get_score_count")
@@ -116,7 +107,7 @@ def get_actor(platform: str, year: int):
   #Check null values or if exists
   if actor == 'no':
     return {
-    "data": { "actor": None },
+    "data": None,
     "error": None,
     "status": "OK"
   }
