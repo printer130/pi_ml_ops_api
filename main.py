@@ -85,7 +85,7 @@ def get_score_count(platform: str, score: int, year: int):
 """ Cantidad de películas por plataforma con filtro de PLATAFORMA. (La función debe llamarse get_count_platform(platform))
  """
 @app.get("/api/get_count_platform")
-def get_count_platform(platform):
+async def get_count_platform(platform):
   collection = get_database()
   movie = get_most_common_movie(collection, platform)
 
@@ -124,3 +124,14 @@ def get_actor(platform: str, year: int):
     "error": None,
     "status": "OK"
   }
+
+
+async def main():
+    config = uvicorn.Config("main:app", port=5000, log_level="info")
+    server = uvicorn.Server(config)
+    await server.serve()
+
+#if __name__ == "__main__":
+#    config = uvicorn.Config("main:app", port=5000, log_level="info")
+#    server = uvicorn.Server(config)
+#    server.run()
