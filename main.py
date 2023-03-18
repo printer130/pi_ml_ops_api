@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status, APIRouter
-import os
-import uvicorn
 from db import get_database
+
+import uvicorn
 import json
 #from fastapi.middleware.cors import CORSMiddleware
 from query import get_most_common_actor, get_most_common_movie, get_max_duration_by
@@ -93,8 +93,6 @@ def get_score_count(platform: str, score: int, year: int):
  """
 @app.get("/api/get_count_platform")
 def get_count_platform(platform):
-  db = os.environ.get("DATABASE_URL")
-  print(db)
   collection = get_database()
   movie = get_most_common_movie(collection, platform)
 
@@ -135,10 +133,10 @@ def get_actor(platform: str, year: int):
   }
 
 
-async def main():
-    config = uvicorn.Config("main:app", port=5000, log_level="info")
-    server = uvicorn.Server(config)
-    await server.serve()
+""" async def main():
+  config = uvicorn.Config("main:app", port=5000, log_level="info")
+  server = uvicorn.Server(config)
+  await server.serve() """
 
 #if __name__ == "__main__":
 #    config = uvicorn.Config("main:app", port=5000, log_level="info")

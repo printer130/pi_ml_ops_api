@@ -1,8 +1,12 @@
 from pymongo import MongoClient
 from dotenv import load_dotenv
+
 import os
+
 load_dotenv()
 DATABASE_URL = os.environ.get("DATABASE_URL")
+
+#mongodb+srv://printer:<password>@clustercu.yfxun.mongodb.net/?retryWrites=true&w=majority
 #DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_database():
