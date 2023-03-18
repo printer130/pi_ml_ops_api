@@ -1,5 +1,6 @@
 import pandas as pd
 from constants import dicc
+import numpy as np
 
 def get_dataframe(file_path):
   df = pd.read_csv(file_path)
@@ -30,8 +31,9 @@ def handle_datefield(df):
 
 def handle_duration(df):
   new = df["duration"].str.split(" ", n = 1, expand = True)
-  #df["duration_int"] = new[0]
-  df["duration_int"] = new[0].astype('Int64')
+  df["duration_int"] = new[0]
+  #df["duration_int"] = new[0].astype(np.int16)
+  df["duration_int"] = df["duration_int"].apply(lambda x: int(x) if type(x) == np.dtype('U') else x)
   mean = df["duration_int"].mean(axis=0, numeric_only=True, skipna=True)
   df["duration_int"].fillna(round(mean), inplace=True)
   df["duration_type"] = new[1]

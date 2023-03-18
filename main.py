@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status, APIRouter
-from db import get_database
+from db import get_database, client
 
 import uvicorn
 import json
@@ -19,6 +19,10 @@ origins = [
     allow_methods=["*"],
     allow_headers=["*"],
 ) """
+
+@app.on_event("shutdown")
+async def app_shutdown():
+    await client.close()
 
 @app.get("/")
 def root():
@@ -132,13 +136,32 @@ def get_actor(platform: str, year: int):
     "status": "OK"
   }
 
+""" def fake_answer_to_everything_ml_model(x: float):
+    return x * 42 """
+
+ml_models = {}
+
+""" @asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load the ML model
+    ml_models["answer_to_everything"] = fake_answer_to_everything_ml_model
+    yield
+    # Clean up the ML models and release the resources
+    ml_models.clear()
+app = FastAPI(lifespan=lifespan) """
+
+@app.get("/api/predict")
+async def predict(x: float):
+  result = ml_models["answer_to_everything"](x)
+  return {"result": result} 
+
 
 """ async def main():
   config = uvicorn.Config("main:app", port=5000, log_level="info")
   server = uvicorn.Server(config)
   await server.serve() """
 
-#if __name__ == "__main__":
-#    config = uvicorn.Config("main:app", port=5000, log_level="info")
-#    server = uvicorn.Server(config)
-#    server.run()
+if __name__ == "__main__":
+    config = uvicorn.Config("main:app", port=5000, log_level="info")
+    server = uvicorn.Server(config)
+    server.run()

@@ -8,12 +8,13 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 #mongodb+srv://printer:<password>@clustercu.yfxun.mongodb.net/?retryWrites=true&w=majority
 #DATABASE_URL = os.getenv("DATABASE_URL")
+client = MongoClient(DATABASE_URL)
 
 def get_database():
-  client = MongoClient(DATABASE_URL)
   db = client["cu"]
   collection = db["with_types"]
   return collection
+
   #try:
   #  db_cu = db.cu
     #yield db_cu
