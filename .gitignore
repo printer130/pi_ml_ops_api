@@ -10,9 +10,12 @@ ratings/**
 ratings/*
 ratings
 datasets
+eda_env
 out.csv
+ratings_with_types.txt
 ratings.csv
 out.zip
+settings.json
 wtf
 out_ratings.zip
 out_ratings.csv

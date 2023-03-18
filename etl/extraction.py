@@ -11,6 +11,10 @@ def handle_nulls(df):
   df["country"].fillna("unknown", inplace=True)
   #df["date_added"].fillna("no", inplace=True)
   df["rating"].fillna("G", inplace=True)
+  # remove if contain min | seasons or season in col
+  df = df[~df['rating'].str.contains('min')]
+  df = df[~df['rating'].str.contains('seasons')]
+  df = df[~df['rating'].str.contains('season')]
   return df
 
 def handle_ids(df, id, platform):
