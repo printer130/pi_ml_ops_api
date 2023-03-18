@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status, APIRouter
-from db import get_database, client
+from db import get_database, init_db
 
 import uvicorn
 import json
@@ -22,13 +22,11 @@ origins = [
 
 @app.on_event("shutdown")
 async def app_shutdown():
-    await client.close()
+    await init_db().close()
 
 @app.get("/")
-def root():
-  return {
-    "ok": "running"
-  }
+async def root():
+    return { "running": "leonardo" }
 
 """ Película con mayor duración con filtros opcionales de AÑO, PLATAFORMA Y TIPO DE DURACIÓN. (la función debe llamarse get_max_duration(year, platform, duration_type)) """
 @app.get('/api/get_max_duration')
