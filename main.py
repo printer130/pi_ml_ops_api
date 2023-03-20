@@ -24,7 +24,6 @@ origins = [
 async def root():
     return { "running": "leonardo" }
 
-""" Película con mayor duración con filtros opcionales de AÑO, PLATAFORMA Y TIPO DE DURACIÓN. (la función debe llamarse get_max_duration(year, platform, duration_type)) """
 @app.get('/api/get_max_duration')
 def get_max_duration(year: int=None,platform: str=None, duration_type: str=None):
   collection = get_database()
@@ -39,8 +38,6 @@ def get_max_duration(year: int=None,platform: str=None, duration_type: str=None)
     "status": "Ok"
   }
 
-""" Cantidad de películas por plataforma con un puntaje mayor a XX en determinado año (la función debe llamarse get_score_count(platform, scored, year))
-"""
 @app.get("/api/get_score_count")
 def get_score_count(platform: str, score: int, year: int):
   collection = get_database()
@@ -52,8 +49,6 @@ def get_score_count(platform: str, score: int, year: int):
     "status": "Ok"
   }
 
-""" Cantidad de películas por plataforma con filtro de PLATAFORMA. (La función debe llamarse get_count_platform(platform))
- """
 @app.get("/api/get_count_platform")
 def get_count_platform(platform):
   collection = get_database()
@@ -71,8 +66,6 @@ def get_count_platform(platform):
     "status": 'ok',
     "error": None
   }
-  
-""" Actor que más se repite según plataforma y año. (La función debe llamarse get_actor(platform, year)) """
 
 @app.get('/api/get_actor')
 def get_actor(platform: str, year: int):
@@ -93,7 +86,7 @@ def get_actor(platform: str, year: int):
 """ def fake_answer_to_everything_ml_model(x: float):
     return x * 42 """
 
-ml_models = {}
+#ml_models = {}
 
 """ @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -104,10 +97,10 @@ async def lifespan(app: FastAPI):
     ml_models.clear()
 app = FastAPI(lifespan=lifespan) """
 
-@app.get("/api/predict")
+""" @app.get("/api/predict")
 async def predict(x: float):
   result = ml_models["answer_to_everything"](x)
-  return {"result": result} 
+  return {"result": result}  """
 
 
 """ async def main():
