@@ -18,7 +18,7 @@ def init_db():
 def get_database():
   client = init_db()
   db = client["cu"]
-  collection = db["with_types"]
+  collection = db["movies_clean"]
   return collection
     
 
