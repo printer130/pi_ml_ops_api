@@ -14,7 +14,6 @@ class MongoJSONEncoder(json.JSONEncoder):
 
 def get_max_duration_by(collection, year, duration_type, platform):
   filters = []
-  movies = []
   if year:
     filters.append({ "release_year": { "$eq": int(year) }})
   if platform:
@@ -22,13 +21,21 @@ def get_max_duration_by(collection, year, duration_type, platform):
   if duration_type:
     filters.append({ "duration_type": { "$eq": duration_type }})
 
-  query = {
-    "$and": filters
-  }
+  query = { "$and": filters }
 
-  cursor = collection.find(query)
+  cursor = collection.find(query).sort("duration_int", -1).limit(1)
   data_json = MongoJSONEncoder().encode(list(cursor))
   return data_json
+
+def get_score_count_by(collection, platform, year, score):
+  cursor = collection.aggregate([
+    {
+      "$match": { "platform": platform, "release_year": int(year), "mean_score": { "$gte": score }}
+    },
+    { "$count": "quantity" }
+  ])
+  count_score = MongoJSONEncoder().encode(list(cursor))
+  return count_score
 
 def get_most_common_actor(collection,platform,year):
   res = []
@@ -69,8 +76,6 @@ def get_most_common_movie(collection, platform):
       }
     }
   ]
-  result = collection.aggregate(query)
-  platform = {}
-  for i, val in enumerate(result):
-    platform = val
-  return platform
+  cursor = collection.aggregate(query)
+  result = MongoJSONEncoder().encode(list(cursor))
+  return result
