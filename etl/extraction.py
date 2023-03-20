@@ -6,6 +6,10 @@ def get_dataframe(file_path):
   df = pd.read_csv(file_path)
   return df
 
+def get_df_rating(file_path):
+  df = pd.read_csv(file_path)
+  return df
+
 def handle_nulls(df):
   df["director"].fillna("unknown", inplace=True)
   df["cast"].fillna("unknown", inplace=True)
@@ -51,7 +55,17 @@ def handle_lower(df):
       df[col_name] = df[col_name].str.lower()
   return df
 
-def main(file_path, id, platform):
+def get_mean_score(movie_id, mean_ss):
+  m_s = mean_ss[movie_id]
+  return m_s
+
+def create_score_mean_col(df, df_rating):
+  mean_ss = df_rating.groupby("movieId")["rating"].mean()
+  df["mean_score"] = df["id"].apply(lambda x: get_mean_score(x, mean_ss))
+  return df
+
+
+def main(file_path, id, platform, df_rating):
   df = get_dataframe(file_path)
   print("_----------------->>>", platform)
   print(df.isna().sum())
@@ -60,19 +74,23 @@ def main(file_path, id, platform):
   df = handle_datefield(df)
   df = handle_duration(df)
   df = handle_lower(df)
+  df = create_score_mean_col(df, df_rating)
+  print(df.head(3))
+  print("***********[END]**********")
   return df
 
 if __name__ == "__main__":
   clean_dfs = []
+  df_rating = get_df_rating('out_ratings.csv')
 
   for i, val in enumerate(dicc):
-    clean_df = main(val["file_path"], val["id"], val["platform"])
+    clean_df = main(val["file_path"], val["id"], val["platform"], df_rating)
     clean_dfs.append(clean_df)
 
   merged_df = pd.concat(clean_dfs)
   print(merged_df.shape)
   compression_opts = dict(method='zip',
-                        archive_name='out.csv')
+                        archive_name='movies_clean.csv')
 
-  merged_df.to_csv('out.zip', encoding='utf-8', index=False, compression=compression_opts) 
+  merged_df.to_csv('movies_clean.zip', encoding='utf-8', index=False, compression=compression_opts) 
 
