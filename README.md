@@ -46,6 +46,8 @@
 
 #### predict model
 
+[Ir a la url del modelo](https://huggingface.co/printer130/ml/tree/main)
+
 *`/api/predict/?user_id=500&title=the%20shadow%20of%20the%20sun`*
 
 <br>
