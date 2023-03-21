@@ -14,6 +14,7 @@ class MongoJSONEncoder(json.JSONEncoder):
 
 def get_max_duration_by(collection, year, duration_type, platform):
   filters = []
+  result = {}
   if year:
     filters.append({ "release_year": { "$eq": int(year) }})
   if platform:
@@ -24,20 +25,31 @@ def get_max_duration_by(collection, year, duration_type, platform):
   query = { "$and": filters }
 
   cursor = collection.find(query).sort("duration_int", -1).limit(1)
-  data_json = MongoJSONEncoder().encode(list(cursor))
-  return data_json
+  #data_json = MongoJSONEncoder().encode(list(cursor))
+  #print(data_json)
+  for i in cursor:
+    result = i
+  if result["title"] == None:
+    return None
+  return result["title"]
 
 def get_score_count_by(collection, platform, year, score):
+  result = {}
   cursor = collection.aggregate([
     {
       "$match": { "platform": platform, "release_year": int(year), "mean_score": { "$gte": score }}
     },
     { "$count": "quantity" }
   ])
-  count_score = MongoJSONEncoder().encode(list(cursor))
-  return count_score
+  for i in cursor:
+    result = i
+    
+  if result["quantity"] == None:
+    return None
+  
+  return result["quantity"]
 
-def get_most_common_actor(collection,platform,year):
+def get_most_common_actor(collection, platform, year):
   res = []
   query = [
     {
@@ -61,6 +73,7 @@ def get_most_common_actor(collection,platform,year):
   return obj_actor
 
 def get_most_common_movie(collection, platform):
+  result = {}
   query = [
     {
       "$match": {
@@ -74,8 +87,19 @@ def get_most_common_movie(collection, platform):
           "$sum": 1
         }
       }
+    },
+    {
+      "$project": {
+        "_id": 0,
+        "count": 1
+      }
     }
   ]
   cursor = collection.aggregate(query)
-  result = MongoJSONEncoder().encode(list(cursor))
-  return result
+  for i in cursor:
+    result = i
+
+  if result["count"] == None:
+    return None
+
+  return result["count"]

@@ -1,3 +1,4 @@
+env_sci
 __pycache__
 .env
 env_api
@@ -7,11 +8,14 @@ amazon_prime_titles.csv
 disney_plus_titles.csv
 hulu_titles.csv
 netflix_titles.csv
+best_model_b.pkl
+best_model.pkl
 ratings/**
 ratings/*
 ratings
 movies_clean.csv
 movies_clean.zip
+
 datasets
 out.csv
 ratings_with_types.txt

@@ -4,12 +4,12 @@ from db import get_database, init_db
 import uvicorn
 import json
 #from fastapi.middleware.cors import CORSMiddleware
-from query import get_most_common_actor, get_most_common_movie, get_max_duration_by, get_score_count_by
+from lib import get_most_common_actor, get_most_common_movie, get_max_duration_by, get_score_count_by
 
 app = FastAPI()
 
 origins = [
-    "http://localhost:8000",
+  "http://localhost:8000",
 ]
 
 """ app.add_middleware(
