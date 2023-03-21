@@ -44,8 +44,12 @@
 
 *`/api/get_actor/?**platform**=amazon&**year**=2010`*
 
+#### predict model
+
+*`/api/predict/?user_id=500&title=the%20shadow%20of%20the%20sun`*
+
 <br>
 
-- [ ] **`Análisis exploratorio de los datos: (Exploratory Data Analysis-EDA)`**:
+- [x] **`Análisis exploratorio de los datos: (Exploratory Data Analysis-EDA)`**:
 
-- [ ] **`Sistema de recomendación`**: 
+- [x] **`Sistema de recomendación`**: 
