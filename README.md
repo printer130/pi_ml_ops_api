@@ -1,7 +1,8 @@
 # PI_ML_OPS
 
 ## Todo
-- **API | URL:** https://api-pi-82r8.onrender.com/api/get_score_count?platform=amazon&year=2014&scored=3
+- **API EXAMPLE** https://api-pi-82r8.onrender.com/api/get_score_count?platform=amazon&year=2014&scored=3
+- **[Front Page](https://spiffy-front.vercel.app)**
 
 ### Transformaciones
 
