@@ -2,6 +2,21 @@ import pandas as pd
 from constants import dicc
 import numpy as np
 
+list_to_replace = [
+  ["1 season", "unrated"],
+  ["1 seasons", "unrated"],
+  ["2 seasons", "unrated"],
+  ["3 seasons", "unrated"],
+  ["4 seasons", "unrated"],
+  ["6 seasons", "unrated"],
+  ["not rated", "unrated"],
+  ["not_rate", "unrated"],
+  ["all_ages", "all"],
+  ["ages_18_", "18+"],
+  ["ages_16_", "16+"],
+  ["16", "16+"]
+]
+
 def get_dataframe(file_path):
   df = pd.read_csv(file_path)
   return df
@@ -14,7 +29,7 @@ def handle_nulls(df):
   df["director"].fillna("unknown", inplace=True)
   df["cast"].fillna("unknown", inplace=True)
   df["country"].fillna("unknown", inplace=True)
-  #df["date_added"].fillna("no", inplace=True)
+  #df["date_added"] = df["date_added"].str.replace(" ", "")
   df["rating"].fillna("G", inplace=True)
   # remove if contain min | seasons or season in col
   df = df[~df['rating'].str.contains('min')]
@@ -29,7 +44,7 @@ def handle_ids(df, id, platform):
   return df
 
 def handle_datefield(df):
-  df["date_added"] =  pd.to_datetime(df["date_added"])
+  df["date_added"] =  pd.to_datetime(df["date_added"], format='mixed', yearfirst=True)
   df["date_added"] = pd.to_datetime(df["date_added"].dt.strftime('%y%m%d'))
   return df
 
@@ -64,6 +79,10 @@ def create_score_mean_col(df, df_rating):
   df["mean_score"] = df["id"].apply(lambda x: get_mean_score(x, mean_ss))
   return df
 
+def handle_ratings(df):
+  for i in list_to_replace:
+    df["rating"] = df["rating"].apply(lambda x: i[1] if i[0] in x else x)
+  return df
 
 def main(file_path, id, platform, df_rating):
   df = get_dataframe(file_path)
@@ -75,6 +94,7 @@ def main(file_path, id, platform, df_rating):
   df = handle_duration(df)
   df = handle_lower(df)
   df = create_score_mean_col(df, df_rating)
+  df = handle_ratings(df)
   print(df.head(3))
   print("***********[END]**********")
   return df
@@ -91,6 +111,6 @@ if __name__ == "__main__":
   print(merged_df.shape)
   compression_opts = dict(method='zip',
                         archive_name='movies_clean.csv')
-
   merged_df.to_csv('movies_clean.zip', encoding='utf-8', index=False, compression=compression_opts) 
+  print("Compressed FILE!")
 
