@@ -1,60 +1,66 @@
 from fastapi import FastAPI, status, APIRouter
 from db import get_database, init_db
-
+from contextlib import asynccontextmanager
+import pickle
 import uvicorn
 import json
-#from fastapi.middleware.cors import CORSMiddleware
-from lib import get_most_common_actor, get_most_common_movie, get_max_duration_by, get_score_count_by
+from fastapi.middleware.cors import CORSMiddleware
+from lib import get_most_common_actor, get_most_common_movie, get_max_duration_by, get_score_count_by, get_prod_per_county
 
+ml_model  = {}
+
+""" @asynccontextmanager
+async def lifespan(app: FastAPI):
+  with open('model.pkl' , 'rb') as f:
+    ml_model["answer"] = pickle.load(f)
+    yield
+    ml_model["answer"].clear() """
+
+""" app = FastAPI(lifespan=lifespan) """
+ 
 app = FastAPI()
-
 origins = [
-  "http://localhost:8000",
+  "http://localhost:5000",
 ]
 
-""" app.add_middleware(
-    CORSMiddleware,
-    allow_origins='*',
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-) """
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins='*',
+  allow_methods=["GET"],
+)
 
 @app.get("/")
 async def root():
-    return { "running": "leonardo" }
+  return { "running": "leonardo" }
 
 @app.get('/api/get_max_duration')
-def get_max_duration(year: int=None,platform: str=None, duration_type: str=None):
+def get_max_duration(year: int=None, platform: str=None, duration_type: str=None):
   collection = get_database()
-  movies_json = get_max_duration_by(collection, year, duration_type, platform)
-  if movies_json == None:
+  respuesta = get_max_duration_by(collection, year, duration_type, platform)
+  print(respuesta)
+  if respuesta == None:
     return {
-      "data": None
+      'pelicula': "Ups!"
     }
   return {
-    "data": movies_json,
-    "error": None,
-    "status": "Ok"
+    'pelicula': respuesta
   }
 
 @app.get("/api/get_score_count")
-def get_score_count(platform: str, score: int, year: int):
+def get_score_count(platform: str, scored: int, year: int):
   collection = get_database()
-  quantity = get_score_count_by(collection, platform, year, score)
+  quantity = get_score_count_by(collection, platform, year, scored)
 
   return {
-    "data": quantity,
-    "error": None,
-    "status": "Ok"
+    "count": quantity
   }
 
 @app.get("/api/get_count_platform")
 def get_count_platform(platform):
   collection = get_database()
-  movie = get_most_common_movie(collection, platform)
+  quantity = get_most_common_movie(collection, platform)
 
-  if not movie:
+  if not quantity:
     return {
       "data": None,
       "status": 'ok',
@@ -62,15 +68,14 @@ def get_count_platform(platform):
     }
 
   return {
-    "data": movie,
-    "status": 'ok',
-    "error": None
+    "count": quantity,
   }
 
 @app.get('/api/get_actor')
 def get_actor(platform: str, year: int):
   collection = get_database()
   obj_actor = get_most_common_actor(collection, platform, year)
+
   if obj_actor["_id"] == 'unknown':
     return {
     "data": None,
@@ -78,35 +83,80 @@ def get_actor(platform: str, year: int):
     "status": "OK"
   }
   return {
-    "data": obj_actor,
-    "error": None,
-    "status": "OK"
+      'actor': obj_actor["_id"],
   }
 
-""" def fake_answer_to_everything_ml_model(x: float):
-    return x * 42 """
+@app.get('/api/prod_per_county')
+def prod_per_county(type: str, country: str, year: int):
+  collection = get_database()
+  count = get_prod_per_county(collection, type, country, year)
 
-#ml_models = {}
+  if count == None:
+    return {
+      "count": None
+    }
 
-""" @asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Load the ML model
-    ml_models["answer_to_everything"] = fake_answer_to_everything_ml_model
-    yield
-    # Clean up the ML models and release the resources
-    ml_models.clear()
-app = FastAPI(lifespan=lifespan) """
+  return count
+
+@app.get('/api/get_contents')
+def get_contents(rating: str):
+  collection = get_database()
+  res = collection.aggregate([
+    {
+      "$match": {
+        "rating": str(rating)
+      }
+    },
+    {
+      "$group": {
+        "_id": None,
+        "count": { "$sum": 1 } 
+      }
+    }
+  ])
+
+  quantity = {}
+
+  for i in res:
+    quantity = i
+
+  if bool(quantity):
+    return {
+        'count': quantity
+      }
+
+  return {
+    'count': None
+  }
 
 """ @app.get("/api/predict")
-async def predict(x: float):
-  result = ml_models["answer_to_everything"](x)
-  return {"result": result}  """
+async def predict(user_id: int, title: str):
+  collection = get_database()
 
+  cursor = collection.find({
+    "$and": [
+      { "title": { "$eq": title }}
+    ]
+  })
 
-""" async def main():
+  if cursor == None:
+    return { "result": None }
+
+  movie = {}
+
+  for i in cursor:
+    movie = i
+
+  result = ml_model["answer"].predict(int(user_id), movie["id"]).est
+
+  print(result)
+
+  return { "result": result } """
+
+"""async def main():
   config = uvicorn.Config("main:app", port=5000, log_level="info")
   server = uvicorn.Server(config)
-  await server.serve() """
+  await server.serve()"""
 
 if __name__ == "__main__":
     config = uvicorn.Config("main:app", port=5000, log_level="info")

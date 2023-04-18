@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
 DATABASE_URL = os.environ.get("DATABASE_URL")
 def init_db():
   try:
@@ -12,15 +13,11 @@ def init_db():
   finally:
     client.close()
   
-#mongodb+srv://printer:<password>@clustercu.yfxun.mongodb.net/?retryWrites=true&w=majority
-#DATABASE_URL = os.getenv("DATABASE_URL")
-
-def get_database():
+def get_database(doc = "movies"):
   client = init_db()
-  db = client["cu"]
-  collection = db["movies_clean"]
+  db = client["plat"]
+  collection = db[doc]
   return collection
-    
 
   #try:
   #  db_cu = db.cu

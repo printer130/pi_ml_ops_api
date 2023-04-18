@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from typing import Any
-
+from queries import score_count_query, max_duration_by, most_common_actor, most_common_movie
 from bson import ObjectId
 
 class MongoJSONEncoder(json.JSONEncoder):
@@ -13,56 +13,30 @@ class MongoJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 def get_max_duration_by(collection, year, duration_type, platform):
-  filters = []
   result = {}
-  if year:
-    filters.append({ "release_year": { "$eq": int(year) }})
-  if platform:
-    filters.append({ "platform": { "$eq": platform }})
-  if duration_type:
-    filters.append({ "duration_type": { "$eq": duration_type }})
-
-  query = { "$and": filters }
-
+  query = max_duration_by(platform, year, duration_type)
   cursor = collection.find(query).sort("duration_int", -1).limit(1)
-  #data_json = MongoJSONEncoder().encode(list(cursor))
-  #print(data_json)
   for i in cursor:
     result = i
   if result["title"] == None:
     return None
   return result["title"]
 
-def get_score_count_by(collection, platform, year, score):
+def get_score_count_by(collection, platform, year, scored):
   result = {}
-  cursor = collection.aggregate([
-    {
-      "$match": { "platform": platform, "release_year": int(year), "mean_score": { "$gte": score }}
-    },
-    { "$count": "quantity" }
-  ])
+  query = score_count_query(platform, year, scored)
+  cursor = collection.aggregate(query)
   for i in cursor:
     result = i
-    
-  if result["quantity"] == None:
-    return None
+
+  if len(result) == 0:
+    return 0
   
   return result["quantity"]
 
 def get_most_common_actor(collection, platform, year):
   res = []
-  query = [
-    {
-      "$match": {"platform": platform, "release_year": int(year) }
-    },
-    { "$group" : {"_id":"$director", "count":{"$sum":1}} },
-    { 
-      "$sort": { "count": -1 } 
-    },
-    {
-      "$limit": 2
-    }
-  ]
+  query = most_common_actor(platform, year)
   result = collection.aggregate(query)
   for item in result:
     res.append(item)
@@ -74,27 +48,7 @@ def get_most_common_actor(collection, platform, year):
 
 def get_most_common_movie(collection, platform):
   result = {}
-  query = [
-    {
-      "$match": {
-        "platform": platform
-      }
-    },
-    {
-      "$group": {
-        "_id": "$platform",
-        "count": {
-          "$sum": 1
-        }
-      }
-    },
-    {
-      "$project": {
-        "_id": 0,
-        "count": 1
-      }
-    }
-  ]
+  query = most_common_movie(platform)
   cursor = collection.aggregate(query)
   for i in cursor:
     result = i
@@ -103,3 +57,21 @@ def get_most_common_movie(collection, platform):
     return None
 
   return result["count"]
+
+def get_prod_per_county(collection, type, country, year):
+  result = {}
+  res = collection.aggregate([
+    {
+      "$match": {"type": type, "release_year": int(year), "country": country }
+    },
+    { 
+      "$group": {
+         "_id": None,
+         "count": { "$sum": 1 } 
+      }
+    }
+  ])
+  for i in res:
+    result["count"] = i["count"]
+    
+  return result
